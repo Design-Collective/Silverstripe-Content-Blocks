@@ -15,12 +15,16 @@ class Block extends DataObject {
 		'VideoURL' => 'Varchar',
 		'Template' => 'Varchar',
 		'Active' => 'Boolean(1)'
-    );
+  );
+
+  private static $has_one = array(
+  	'BackgroundImage' => 'Image'
+  );
 
 	private static $many_many = array(
 		'Images' => 'Image',
 		'Files' => 'File'
-    );
+  );
 
 	private static $many_many_extraFields = array(
 		'Images' => array('SortOrder' => 'Int'),
@@ -94,7 +98,6 @@ class Block extends DataObject {
 		$fields->removeByName('Header');
 		$fields->removeByName('Images');
 		$fields->removeByName('Files');
-		$fields->removeByName('Articles');
 
 		// Media tab
 		$fields->addFieldToTab('Root', new TabSet('Media'));
@@ -115,10 +118,14 @@ class Block extends DataObject {
 		$imgField = new SortableUploadField('Images', 'Images');
 		$imgField->allowedExtensions = array('jpg', 'gif', 'png');
 
+		$bgField = new UploadField('BackgroundImage', 'Select Background Image');
+		$bgField->allowedExtensions = array('jpg', 'gif', 'png');
+
 		$fields->addFieldsToTab("Root.Main", new TextField('Name', 'Name'));
 		$fields->addFieldsToTab("Root.Main", new DropdownField('Header', 'Use name as header', $this->dbObject('Header')->enumValues()), 'Content');
 		$fields->addFieldsToTab("Root.Main", new HTMLEditorField('Content', 'Content'));
 
+		$fields->addFieldToTab('Root.Media.Images', $bgField);
 		$fields->addFieldToTab('Root.Media.Images', $imgField);
 
 		$fileField = new SortableUploadField('Files', 'Files');

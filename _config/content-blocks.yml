@@ -1,7 +1,7 @@
 ---
 name: ContentBlocksModule
 ---
-Page:
+Article:
   extensions:
     - ContentBlocksModule
 LeftAndMain:

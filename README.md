@@ -1,4 +1,4 @@
-Silverstripe-Content-Blocks (previous: Silverstripe-Section-Module)
+Silverstripe-Content-Blocks for Articles
 ===========================
 
 Split your page content into manageable sections/blocks of content, each with their own template.

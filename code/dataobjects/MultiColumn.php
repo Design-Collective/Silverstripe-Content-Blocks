@@ -10,11 +10,11 @@ class MultiColumn extends Block {
 
 	static $many_many = array(
 		'Blocks' => 'Block'
-    );
+  );
 
 	private static $many_many_extraFields=array(
-        'Blocks'=>array('SortOrder'=>'Int')
-    );
+     'Blocks'=>array('SortOrder'=>'Int')
+  );
 
 	private static $defaults = array(
 		'Template' => 'MultiColumn',
@@ -30,7 +30,7 @@ class MultiColumn extends Block {
 
 		$fields = parent::getCMSFields();
 
-		$fields->removeByName(array('ArticleID','SortOrder', 'Active', 'Title', 'Content', 'Blocks', 'YoutubeVideoID', 'Images', 'Media', 'Files', 'Videos'));
+		$fields->removeByName(array('ArticleID','SortOrder', 'Active', 'Title', 'Content', 'Blocks', 'YoutubeVideoID', 'Images', 'Media', 'Files', 'Videos', 'Template'));
 
 
 		if ($this->ID) {

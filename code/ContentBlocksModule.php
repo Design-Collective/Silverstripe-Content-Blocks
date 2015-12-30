@@ -82,9 +82,9 @@ class ContentBlocksModule extends DataExtension {
 		}
 	}
 
-	public function contentcontrollerInit($controller) {
-		Requirements::themedCSS('block');
-	}
+	// public function contentcontrollerInit($controller) {
+	// 	Requirements::themedCSS('block');
+	// }
 
 	/**
 	* Simple support for Translatable, when a page is translated, copy all content blocks and relate to translated page

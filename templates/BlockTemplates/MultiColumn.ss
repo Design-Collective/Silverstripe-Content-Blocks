@@ -1,4 +1,5 @@
-<div class="columns">
+<% include BlockStart %>
+
 	<div class="row block">
 		<% if $Header != "None" %>
 			<div class="small-12 columns">
@@ -15,4 +16,5 @@
 		<% end_loop %>
 
 	</div>
-</div>
+
+<% include BlockEnd %>

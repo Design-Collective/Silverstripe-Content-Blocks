@@ -22,7 +22,7 @@ class Block extends DataObject {
   );
 
 	private static $many_many = array(
-		'Images' => 'Image',
+		'Images' => 'BlockImage',
 		'Files' => 'File'
   );
 
@@ -95,43 +95,15 @@ class Block extends DataObject {
 
 		$fields->removeByName('SortOrder');
 		$fields->removeByName('Active');
+		$fields->removeByName('Articles');
+		$fields->removeByName('Root.Settings');
 		$fields->removeByName('Header');
 		$fields->removeByName('Images');
 		$fields->removeByName('Files');
 
-		// Media tab
-		$fields->addFieldToTab('Root', new TabSet('Media'));
-
-		// If this Block belongs to more than one article, show a warning
-		// TODO: This is not working when a block is added under another block
-		$pcount = $this->Articles()->Count();
-		if($pcount > 1) {
-			$globalwarningfield = new LiteralField("IsGlobalBlockWarning", '<p class="message warning">This block is in use on '.$pcount.' pages - any changes made will also affect the block on these pages</p>');
-			$fields->addFieldToTab("Root.Template", $globalwarningfield);
-			$fields->addFieldToTab("Root.Main", $globalwarningfield, 'Name');
-			$fields->addFieldToTab("Root.Media.Images", $globalwarningfield);
-			$fields->addFieldToTab("Root.Media.Files", $globalwarningfield);
-			$fields->addFieldToTab("Root.Media.Video", $globalwarningfield);
-			$fields->addFieldToTab("Root.Settings", $globalwarningfield);
+		if($this->Template!="MultiColumn") {
+			$fields->removeByName("Blocks");
 		}
-
-		$imgField = new SortableUploadField('Images', 'Images');
-		$imgField->allowedExtensions = array('jpg', 'gif', 'png');
-
-		$bgField = new UploadField('BackgroundImage', 'Select Background Image');
-		$bgField->allowedExtensions = array('jpg', 'gif', 'png');
-
-		$fields->addFieldsToTab("Root.Main", new TextField('Name', 'Name'));
-		$fields->addFieldsToTab("Root.Main", new DropdownField('Header', 'Use name as header', $this->dbObject('Header')->enumValues()), 'Content');
-		$fields->addFieldsToTab("Root.Main", new HTMLEditorField('Content', 'Content'));
-
-		$fields->addFieldToTab('Root.Media.Images', $bgField);
-		$fields->addFieldToTab('Root.Media.Images', $imgField);
-
-		$fileField = new SortableUploadField('Files', 'Files');
-
-		$fields->addFieldToTab('Root.Media.Files', $fileField);
-		$fields->addFieldToTab('Root.Media.Video', new TextField('VideoURL', 'Video URL'));
 
 		// Template tab
 		$optionset = array();
@@ -158,29 +130,63 @@ class Block extends DataObject {
 				$optionset,
 				$this->Template
 			)->addExtraClass('stacked');
-			$fields->addFieldsToTab("Root.Template", $tplField);
+			$fields->insertBefore("Name", $tplField);
 
 		} else {
-			$fields->addFieldsToTab("Root.Template", new LiteralField ($name = "literalfield", $content = '<p class="message warning"><strong>Warning:</strong> The folder '.$src.' was not found.</div>'));
+			$fields->insertBefore("Name", new LiteralField ($name = "literalfield", $content = '<p class="message warning"><strong>Warning:</strong> The folder '.$src.' was not found.</div>'));
 		}
+
+		// Media tab
+		$fields->addFieldToTab('Root', new TabSet('Media'));
+
+		// If this Block belongs to more than one article, show a warning
+		// TODO: This is not working when a block is added under another block
+		$pcount = $this->Articles()->Count();
+		if($pcount > 1) {
+			$globalwarningfield = new LiteralField("IsGlobalBlockWarning", '<p class="message warning">This block is in use on '.$pcount.' pages - any changes made will also affect the block on these pages</p>');
+			$fields->addFieldToTab("Root.Template", $globalwarningfield);
+			$fields->addFieldToTab("Root.Main", $globalwarningfield, 'Name');
+			$fields->addFieldToTab("Root.Media.Images", $globalwarningfield);
+			$fields->addFieldToTab("Root.Media.Files", $globalwarningfield);
+			$fields->addFieldToTab("Root.Media.Video", $globalwarningfield);
+			$fields->addFieldToTab("Root.Settings", $globalwarningfield);
+		}
+
+		$imgField = new SortableUploadField('Images', 'Images');
+		$imgField->allowedExtensions = array('jpg', 'gif', 'png', 'jpeg');
+
+		$bgField = new UploadField('BackgroundImage', 'Select Background Image');
+		$bgField->allowedExtensions = array('jpg', 'gif', 'png');
+
+		$fields->addFieldsToTab("Root.Main", new TextField('Name', 'Name'));
+		$fields->addFieldsToTab("Root.Main", new DropdownField('Header', 'Use name as header', $this->dbObject('Header')->enumValues()), 'Content');
+		$fields->addFieldsToTab("Root.Main", new HTMLEditorField('Content', 'Content'));
+
+		$fields->addFieldToTab('Root.Main', $bgField);
+		$fields->addFieldToTab('Root.Media.Images', $imgField);
+
+		$fileField = new SortableUploadField('Files', 'Files');
+
+		$fields->addFieldToTab('Root.Media.Files', $fileField);
+		$fields->addFieldToTab('Root.Media.Video', new TextField('VideoURL', 'Video URL'));
 
 		// Settings tab
 		$fields->addFieldsToTab("Root.Settings", new CheckboxField('Active', 'Active'));
 		$fields->addFieldsToTab("Root.Settings", new TextField('Link', 'Link'));
 
-		if($this->Articles() && $this->ID) {
-	 		$articleList = $this->Articles()->where("Article.ID != ". $this->ID);
-			if($articleList->count() > 0) {
+		// if($this->Articles() && $this->ID) {
+	 // 		$articleList = $this->Articles()->where("Article.ID != ". $this->ID);
+		// 	if($articleList->count() > 0) {
 
-				$ArticlesConfig = GridFieldConfig_RelationEditor::create(10);
-				$ArticlesConfig->removeComponentsByType('GridFieldAddNewButton');
-				$ArticlesConfig->removeComponentsByType('GridFieldAddExistingAutocompleter');
+		// 		$ArticlesConfig = GridFieldConfig_RelationEditor::create(10);
+		// 		$ArticlesConfig->removeComponentsByType('GridFieldAddNewButton');
+		// 		$ArticlesConfig->removeComponentsByType('GridFieldAddExistingAutocompleter');
 
-				$gridField = new GridField("Articles", "Related articles (This block is used on the following articles)", $this->Articles(), $ArticlesConfig);
+		// 		$gridField = new GridField("Articles", "Related articles (This block is used on the following articles)", $this->Articles(), $ArticlesConfig);
 
-				$fields->addFieldToTab("Root.Settings", $gridField);
-			}
-		}
+		// 		$fields->addFieldToTab("Root.Settings", $gridField);
+		// 	}
+		// }
 
 		return $fields;
 	}
@@ -297,4 +303,32 @@ class Block extends DataObject {
 	function file_ext_strip($filename){
 		return preg_replace('/\.[^.]*$/', '', $filename);
 	}
+
+	public function ImageClass() {
+		$count = $this->Images()->count();
+		$s = 2;
+		$m = 3;
+		$l = 4;
+		if($count%4 == 0) {
+			$m = 2;
+		}
+		if($count%5 == 0) {
+			$s=1;
+			$m=5;
+			$l=5;
+		}
+		if($count%3 == 0) {
+			if($count==3) {
+				$s =1;
+			}
+			$m=3;
+			$l=3;
+		}
+		return sprintf("small-up-%d medium-up-%d large-up-%d",
+			$s,
+			$m,
+			$l
+		);
+	}
+
 }

@@ -8,13 +8,15 @@ class Block extends DataObject {
 	//public static $default_sort = 'SortOrder';
 
 	private static $db = array(
-        'Name' => 'Varchar',
+    'Name' => 'Varchar',
 		'Header' => "Enum('None, h1, h2, h3, h4, h5, h6')",
 		'Content' => 'HTMLText',
-        'Link' => 'Varchar',
+    'Link' => 'Varchar',
 		'VideoURL' => 'Varchar',
 		'Template' => 'Varchar',
-		'Active' => 'Boolean(1)'
+		'Active' => 'Boolean(1)',
+		'BackgroundColor' => 'Varchar(7)',
+		'CustomCSSClass' => 'Varchar(255)'
   );
 
   private static $has_one = array(
@@ -162,7 +164,9 @@ class Block extends DataObject {
 		$fields->addFieldsToTab("Root.Main", new DropdownField('Header', 'Use name as header', $this->dbObject('Header')->enumValues()), 'Content');
 		$fields->addFieldsToTab("Root.Main", new HTMLEditorField('Content', 'Content'));
 
+		$fields->addFieldToTab('Root.Main', new ColorField("BackgroundColor", "BackgroundColor"));
 		$fields->addFieldToTab('Root.Main', $bgField);
+
 		$fields->addFieldToTab('Root.Media.Images', $imgField);
 
 		$fileField = new SortableUploadField('Files', 'Files');

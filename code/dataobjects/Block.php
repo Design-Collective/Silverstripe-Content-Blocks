@@ -143,16 +143,16 @@ class Block extends DataObject {
 
 		// If this Block belongs to more than one article, show a warning
 		// TODO: This is not working when a block is added under another block
-		$pcount = $this->Articles()->Count();
-		if($pcount > 1) {
-			$globalwarningfield = new LiteralField("IsGlobalBlockWarning", '<p class="message warning">This block is in use on '.$pcount.' pages - any changes made will also affect the block on these pages</p>');
-			$fields->addFieldToTab("Root.Template", $globalwarningfield);
-			$fields->addFieldToTab("Root.Main", $globalwarningfield, 'Name');
-			$fields->addFieldToTab("Root.Media.Images", $globalwarningfield);
-			$fields->addFieldToTab("Root.Media.Files", $globalwarningfield);
-			$fields->addFieldToTab("Root.Media.Video", $globalwarningfield);
-			$fields->addFieldToTab("Root.Settings", $globalwarningfield);
-		}
+		// $pcount = $this->Articles()->Count();
+		// if($pcount > 1) {
+		// 	$globalwarningfield = new LiteralField("IsGlobalBlockWarning", '<p class="message warning">This block is in use on '.$pcount.' pages - any changes made will also affect the block on these pages</p>');
+		// 	$fields->addFieldToTab("Root.Template", $globalwarningfield);
+		// 	$fields->addFieldToTab("Root.Main", $globalwarningfield, 'Name');
+		// 	$fields->addFieldToTab("Root.Media.Images", $globalwarningfield);
+		// 	$fields->addFieldToTab("Root.Media.Files", $globalwarningfield);
+		// 	$fields->addFieldToTab("Root.Media.Video", $globalwarningfield);
+		// 	$fields->addFieldToTab("Root.Settings", $globalwarningfield);
+		// }
 
 		$imgField = new SortableUploadField('Images', 'Images');
 		$imgField->allowedExtensions = array('jpg', 'gif', 'png', 'jpeg');
@@ -177,6 +177,17 @@ class Block extends DataObject {
 		// Settings tab
 		$fields->addFieldsToTab("Root.Settings", new CheckboxField('Active', 'Active'));
 		$fields->addFieldsToTab("Root.Settings", new TextField('Link', 'Link'));
+
+		$fields->removeByName("CustomCSSClass");
+
+		$choices = array(
+			"sideNoteLeft" => "Left",
+			"sideNoteRight" => "Right"
+		);
+
+		$fields->insertBefore("Name", $templateChoice = DropdownField::create("CustomCSSClass", "Select block type", $choices));
+
+		$templateChoice->displayIf("Template")->isEqualTo("SideNote");
 
 		// if($this->Articles() && $this->ID) {
 	 // 		$articleList = $this->Articles()->where("Article.ID != ". $this->ID);

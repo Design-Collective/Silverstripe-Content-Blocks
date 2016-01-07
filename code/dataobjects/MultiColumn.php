@@ -51,4 +51,13 @@ class MultiColumn extends Block {
 
 		return $fields;
 	}
+
+	public function OrderedBlocks() {
+		$blocks = new ArrayList();
+		foreach($this->Blocks()->Sort("SortOrder") as $block) {
+			$block->Nested = true;
+			$blocks[] = $block;
+		}
+		return $blocks;
+	}
 }

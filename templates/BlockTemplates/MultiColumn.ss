@@ -5,9 +5,9 @@
 	</div>
 	<% end_if %>
 
-	<% loop $Blocks.Sort('SortOrder') %>
+	<% loop $OrderedBlocks %>
 
-		<div class="small-12 large-{$ColumnClass($TotalItems)} columns">
+		<div class="small-12 large-{$ColumnClass($TotalItems)} columns block-nested">
 			$Me
 		</div>
 
